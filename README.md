@@ -1,3 +1,3 @@
 This is a Next.js
 
-HOME TASK 01
+HOME TASK 02
