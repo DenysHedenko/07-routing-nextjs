@@ -2,15 +2,15 @@
 // Functions for making HTTP requests related to notes
 //? ==========================================================
 
-import axios from "axios";
-import Note, { NoteTag } from "../types/note";
+import axios from 'axios';
+import Note, { NoteTag } from '../types/note';
 
 export interface FetchNotesResponse {
     notes: Note[];
     totalPages: number;
 }
 
-type NoteId = Note["id"]
+type NoteId = Note['id'];
 
 export interface FetchNotesParams {
     search?: string;
@@ -21,26 +21,30 @@ export interface FetchNotesParams {
 
 const myKey = process.env.NEXT_PUBLIC_NOTEHUB_TOKEN;
 
-axios.defaults.baseURL = "https://notehub-public.goit.study/api";
+axios.defaults.baseURL = 'https://notehub-public.goit.study/api';
 axios.defaults.headers.common.Authorization = `Bearer ${myKey}`;
 
 //* ==========================================================
 
-export const fetchNotes = async ({ search, page, perPage, tag }: FetchNotesParams) => {
-    const { data } = await axios.get<FetchNotesResponse>("/notes", {
+export async function fetchNotes(
+    page: number,
+    search: string,
+    tag?: string
+): Promise<FetchNotesResponse> {
+    const { data } = await axios.get<FetchNotesResponse>('/notes', {
         params: {
-            search,
-            page,
-            perPage,
-            tag
+            page: page,
+            perPage: 9,
+            search: search,
+            tag: tag,
         },
     });
     return data;
-};
+}
 
 //* ==========================================================
 
-export type CreateNotePayload = Pick<Note, "title" | "content" | "tag">;
+export type CreateNotePayload = Pick<Note, 'title' | 'content' | 'tag'>;
 
 export const createNote = async (noteData: CreateNotePayload) => {
     const { data } = await axios.post<Note>(`/notes`, noteData);

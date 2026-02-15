@@ -3,6 +3,7 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useDebouncedCallback } from 'use-debounce';
 
 import css from './page.module.css';
 import SearchBox from '../../../../components/SearchBox/SearchBox';
@@ -10,28 +11,27 @@ import Pagination from '../../../../components/Pagination/Pagination';
 import NoteList from '../../../../components/NoteList/NoteList';
 import Modal from '../../../../components/Modal/Modal';
 import NoteForm from '../../../../components/NoteForm/NoteForm';
-import { useDebouncedCallback } from 'use-debounce';
-import { fetchNotes, FetchNotesResponse } from '@/lib/api';
+import { fetchNotes, type FetchNotesResponse } from '@/lib/api';
 
-const NOTES_PER_PAGE = 9;
+interface Props {
+  tag: string;
+}
 
-type Props = {
-  initialSearch: string;
-  initialPage: number;
-};
-
-export default function NotesClient({ initialSearch, initialPage }: Props) {
+export default function NotesClient({ tag }: Props) {
   const router = useRouter();
   const pathname = usePathname();
   const sp = useSearchParams();
 
-  const [inputValue, setInputValue] = useState(initialSearch);
+  const normalizedTag = tag === 'all' ? undefined : tag;
 
-  const [text, setText] = useState(initialSearch);
+  // Search state
+  const [inputValue, setInputValue] = useState('');
+  const [text, setText] = useState('');
 
-  const [currentPage, setCurrentPage] = useState(initialPage);
+  // Pagination 
+  const [currentPage, setCurrentPage] = useState(1);
 
-  // Modal
+  // Modal 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
@@ -49,9 +49,11 @@ export default function NotesClient({ initialSearch, initialPage }: Props) {
       params.set('page', String(next.page));
     }
 
-    router.push(`${pathname}?${params.toString()}`);
+    const qs = params.toString();
+    router.push(qs ? `${pathname}?${qs}` : pathname);
   };
 
+  // debounce 
   const debouncedApplySearch = useDebouncedCallback((value: string) => {
     const val = value.trim();
     setText(val);
@@ -69,44 +71,44 @@ export default function NotesClient({ initialSearch, initialPage }: Props) {
     setUrlParams({ page });
   };
 
-  const { data, isLoading, isFetching } = useQuery<FetchNotesResponse>({
-    queryKey: ['notes', text, currentPage],
-    queryFn: () =>
-      fetchNotes({
-        search: text || undefined,
-        page: currentPage,
-        perPage: NOTES_PER_PAGE,
-      }),
+  const { data, isFetching, isLoading } = useQuery<FetchNotesResponse>({
+    queryKey: ['notes', currentPage, text, normalizedTag],
+    queryFn: () => fetchNotes(currentPage, text, normalizedTag),
     placeholderData: keepPreviousData,
   });
 
+  const notes = data?.notes ?? [];
+  const totalPages = data?.totalPages ?? 0;
+
   return (
-    <div className={css.app}>
-      <header className={css.toolbar}>
-        <SearchBox text={inputValue} onSearch={handleSearch} />
+    <>
+      <div className={css.app}>
+        <header className={css.toolbar}>
+          <SearchBox text={inputValue} onSearch={handleSearch} />
 
-        {!!data?.totalPages && data.totalPages > 1 && (
-          <Pagination
-            pageCount={data.totalPages}
-            currentPage={currentPage}
-            onPageChange={handlePageChange}
-          />
-        )}
+          {totalPages > 1 && (
+            <Pagination
+              pageCount={totalPages}
+              currentPage={currentPage}
+              onPageChange={handlePageChange}
+            />
+          )}
 
-        <button className={css.button} onClick={openModal}>
-          Create note +
-        </button>
-      </header>
+          <button className={css.button} onClick={openModal}>
+            Create note +
+          </button>
+        </header>
+      </div>
 
       {(isLoading || isFetching) && <strong>Loading tasks ...</strong>}
 
-      {!isLoading && data && <NoteList notes={data.notes ?? []} />}
+      {notes.length > 0 && !isLoading && <NoteList notes={notes} />}
 
       {isModalOpen && (
         <Modal onClose={closeModal}>
           <NoteForm onClose={closeModal} />
         </Modal>
       )}
-    </div>
+    </>
   );
 }
