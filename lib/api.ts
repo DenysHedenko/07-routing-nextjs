@@ -16,6 +16,7 @@ export interface FetchNotesParams {
     search?: string;
     page?: number;
     perPage?: number;
+    tag?: NoteTag;
 }
 
 const myKey = process.env.NEXT_PUBLIC_NOTEHUB_TOKEN;
@@ -25,12 +26,13 @@ axios.defaults.headers.common.Authorization = `Bearer ${myKey}`;
 
 //* ==========================================================
 
-export const fetchNotes = async ({ search, page, perPage }: FetchNotesParams) => {
+export const fetchNotes = async ({ search, page, perPage, tag }: FetchNotesParams) => {
     const { data } = await axios.get<FetchNotesResponse>("/notes", {
         params: {
             search,
             page,
             perPage,
+            tag
         },
     });
     return data;
@@ -64,7 +66,6 @@ export const deleteNote = async (id: NoteId) => {
 //* ==========================================================
 
 export const fetchNoteById = async (id: NoteId) => {
-    console.log('fetchNoteById id:', id)
     const { data } = await axios.get<Note>(`/notes/${id}`);
     return data;
 };
