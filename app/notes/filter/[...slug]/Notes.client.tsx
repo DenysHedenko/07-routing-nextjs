@@ -4,14 +4,13 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useDebouncedCallback } from 'use-debounce';
-
-import css from './page.module.css';
 import SearchBox from '../../../../components/SearchBox/SearchBox';
 import Pagination from '../../../../components/Pagination/Pagination';
 import NoteList from '../../../../components/NoteList/NoteList';
 import Modal from '../../../../components/Modal/Modal';
 import NoteForm from '../../../../components/NoteForm/NoteForm';
 import { fetchNotes, type FetchNotesResponse } from '@/lib/api';
+import css from './notesPage.module.css'
 
 interface Props {
   tag: string;

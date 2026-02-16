@@ -1,8 +1,9 @@
 'use client';
 import { fetchNoteById } from '@/lib/api';
-import css from './NoteDetails.module.css';
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
+import css from './noteDetails.module.css';
+import Link from 'next/link';
 
 const NoteDetailsClient = () => {
   const { id } = useParams<{ id: string }>();
@@ -17,9 +18,15 @@ const NoteDetailsClient = () => {
     refetchOnMount: false,
   });
 
-  if (isLoading) return <p>Loading, please wait...</p>;
+  if (isLoading) return
+  <p className={css.content}>
+    Loading, please wait...
+  </p>;
 
-  if (error || !note) return <p>Something went wrong.</p>;
+  if (error || !note) return
+  <p className={css.content}>
+    Something went wrong.
+  </p>;
 
   const formattedDate = note.updatedAt
     ? `Updated at: ${note.updatedAt}`
@@ -29,11 +36,14 @@ const NoteDetailsClient = () => {
     <div className={css.container}>
       <div className={css.item}>
         <div className={css.header}>
-          <h2>{note.title}</h2>
+          <h2>{note?.title}</h2>
         </div>
-        <p className={css.tag}>{note.tag}</p>
-        <p className={css.content}>{note.content}</p>
+        <p className={css.tag}>{note?.tag}</p>
+        <p className={css.content}>{note?.content}</p>
         <p className={css.date}>{formattedDate}</p>
+        <Link className={css.backBtn} href={`/notes/filter/all`}>
+          Back to Notes
+        </Link>
       </div>
     </div>
   );

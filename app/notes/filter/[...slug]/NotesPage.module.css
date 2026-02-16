@@ -30,3 +30,10 @@
 .button:hover {
     background-color: #0b5ed7;
 }
+
+.description {
+    font-size: 18px;
+    color: #444444;
+    line-height: 28px;
+    margin-bottom: 16px;
+}

@@ -1,11 +1,15 @@
 'use client';
 
-type Props = {
+import css from './notesPage.module.css'
+
+interface Props {
     error: Error;
 };
 
 const Error = ({ error }: Props) => {
-    return <p>Could not fetch the list of notes. {error.message}</p>;
+    return <p className={css.description}>
+        Could not fetch the list of notes. {error.message}
+    </p>;
 };
 
 export default Error;

@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import css from './NotePreview.module.css'
+import css from './notePreview.module.css'
 import { fetchNoteById } from "@/lib/api";
 import { useParams, useRouter } from "next/navigation";
 import Modal from "@/components/Modal/Modal";
@@ -33,8 +33,8 @@ export default function NotePreviewClient() {
                         Go back
                     </button>
                 </div>
-                {isLoading && <p>Loading, please wait...</p>}
-                {error && !data && <p>Something went wrong.</p>}
+                {isLoading && <p className={css.content}>Loading, please wait...</p>}
+                {error && !data && <p className={css.content}>Something went wrong.</p>}
             </div>
         </Modal>
     );
