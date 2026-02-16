@@ -10,7 +10,7 @@ import NoteList from '../../../../components/NoteList/NoteList';
 import Modal from '../../../../components/Modal/Modal';
 import NoteForm from '../../../../components/NoteForm/NoteForm';
 import { fetchNotes, type FetchNotesResponse } from '@/lib/api';
-import css from './notesPage.module.css'
+import css from './NotesPage.module.css'
 
 interface Props {
   tag: string;
